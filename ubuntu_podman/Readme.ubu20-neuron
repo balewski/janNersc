@@ -1,0 +1,132 @@
+Using Ubu20-neuron8 Docker image
+
+A) = = = = =  USE ON  LAPTOP  = = = = =
+
+My working space outside the image
+mkdir  /Users/balewski/docker_volumes/neuron_wrk
+
+To allow X11 to pop-up execute once on Mac OS, repeat it after every reboot of Mac OS.
+xhost + 127.0.0.1
+
+Also, check XQuartz --> preferences --> Security has both boxes checked. Reboot Mac OS after this change. You do not need to repeat it any more.
+
+A.1) interactive:
+docker run -it -e DISPLAY=host.docker.internal:0  --user balewski --volume /Users/balewski/docker_volumes/neuron_wrk:/neuron_wrk --workdir /neuron_wrk  balewski/ubu20-neuron8:v6 bash
+
+or
+place code in  /Users/balewski/docker_volumes/neuron_wrk
+run Docker inside image:
+python3 test_script.py
+
+# test X11 graphics
+emacs&
+# test gui
+nrngui
+
+
+
+A.2)  Jupyter from laptop
+
+Launch Docker w/ volume mount and port forwarding for JN (below is one very long line)
+
+ docker run -it --user jinan --publish 8886:8886 --volume /Users/balewski/docker_volumes/neuron_wrk:/neuron_wrk  --workdir /neuron_wrk balewski/ubu20-neuron8:v6 jupyter notebook --ip 0.0.0.0 --no-browser --allow-root  --port 8886
+
+
+Throw into local browser : http://127.0.0.1:8886/?token=774ea016...9c321f447b8e
+It should launch JN  and map /neuron_work to /
+In JN:
+* new 'Python kernel'
+* type in JN & execute this 3 lines:
+import matplotlib.pyplot as plt
+import neuron
+neuron.__version__
+
+It will print: 8.0.0
+There should be no errors.
+
+B) = = = = =  empty
+
+C) = = = = =  USE On CORI/NERSC  = = = = =
+
+Image was pulled w/ command
+  shifterimg pull balewski/ubu20-neuron8:v6
+
+C.1) interactive:
+shifter --image=balewski/ubu20-neuron8:v6 bash
+# test NEURON is visible in python3
+python3 -c 'import neuron; print(neuron.__version__)'
+
+# test gui
+nrngui
+
+C.2)  Jupyter from laptop
+Warning:  no local  .jupyter/jupyter_notebook_config.json on Cori
+ ssh to cori with tunnel for port 8884  and use it when launching JN
+ssh -L 8884:localhost:8884 cori
+shifter --image=balewski/ubu20-neuron8:v6 jupyter notebook --ip 0.0.0.0 --no-browser  --port 8884
+
+This will display few options to connect, I'm using the last one:
+ http://127.0.0.1:8884/?token=45670079e6ecfc18113276ee4edce0df22b8fda3472145d0
+
+Throw this http-string to browser running on your laptop and ... magic happens.
+
+* select working dir in JN
+* start 'Python3 kernel'
+* type in JN & execute this 3 lines:
+import matplotlib.pyplot as plt
+import neuron
+neuron.__version__
+
+It will print: 8.0.0
+No errors should be reported
+
+C.3)  Jupyter @ NERSC - uses shifter image as a kernel
+Create this file at your location on Cori:
+balewski@cori10:~> cat .local/share/jupyter/kernels/neuron8/kernel.json
+{
+    "argv": [
+        "shifter",
+        "--image=balewski/ubu20-neuron8:v6",
+        "/usr/bin/python3.8",
+        "-m",
+        "ipykernel_launcher",
+        "-f",
+        "{connection_file}"
+    ],
+    "display_name": "neuron 8.0.0",
+    "language": "python"
+}
+
+
+
+*Open in your browser: https://jupyter.nersc.gov/hub/home
+*select : cori+shared CPU node
+*start kernel: neuron 8.0.0
+* type in JN & execute this 3 lines:
+import matplotlib.pyplot as plt
+import neuron
+neuron.__version__
+
+
+C) = = = = =  USE On Crusher/OLCF w/ singularity  = = = = =
+Upload new image to Crusher
+ salloc -A AST153_crusher -p batch --x11 --exclusive  -t 30:00  -N 1
+export all_proxy=socks://proxy.ccs.ornl.gov:3128/
+export ftp_proxy=ftp://proxy.ccs.ornl.gov:3128/
+export http_proxy=http://proxy.ccs.ornl.gov:3128/
+export https_proxy=http://proxy.ccs.ornl.gov:3128/
+export no_proxy='localhost,127.0.0.0/8,*.ccs.ornl.gov,*.ncrc.gov'
+
+cd  /gpfs/alpine/ast153/scratch/balewski/crusher_x86
+singularity build ubu20-neuron8_v4.sif docker:balewski/ubu20-neuron8:v6 
+
+
+To use new image on crusher interactive 1 node:
+  ssh -Y crusher
+  salloc -A AST153_crusher -p batch --x11 --exclusive  -t 30:00  -N 1
+  cd  /gpfs/alpine/ast153/scratch/balewski/crusher_amd64
+   singularity shell --cleanenv  ubu20-neuron8_v3.sif
+  # test NEURON is visible in python3
+python3 -c 'import neuron; print(neuron.__version__)'
+# test gui
+nrngui

@@ -1,0 +1,7 @@
+OLCF consultant: use  https://hub.docker.com/r/rocm/pytorch
+
+#    Build only for amd64 (AMD), takes 9 min 
+#    time docker build  -f Dockerfile.rocm4.5-crusher-torch -t balewski/rocm4.5-crusher-torch:v4_amd64 .
+real    3m31.306s  
+time docker push balewski/rocm4.5-crusher-torch:v4_amd64
+real	52m31.696s

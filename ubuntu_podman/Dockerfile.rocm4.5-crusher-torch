@@ -1,0 +1,19 @@
+# This dockerfile is meant to work on Crusher@OLCF with MI250X
+# start from https://hub.docker.com/r/rocm/pytorch
+
+FROM rocm/pytorch:rocm4.5.2_ubuntu18.04_py3.8_pytorch_staging
+LABEL maintainer=janstar1122@gmail.com
+
+# Register the ROCM package repository, and install rocm-dev package
+RUN echo 1-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA  OS update   && \
+    apt-get update && \
+    DEBIAN_FRONTEND="noninteractive"  apt-get install -y  locales autoconf automake gcc g++ make vim wget gfortran ssh git emacs aptitude build-essential xterm python3-pip iputils-ping net-tools screen graphviz  pkg-config python3-tk && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN echo 2-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA   python libs  && \
+    pip3 install --upgrade pip && \
+    pip3 install numpy matplotlib h5py ruamel.yaml jupyter  scipy torchsummary tensorboard &&\
+    unset PYTHONSTARTUP
+
+

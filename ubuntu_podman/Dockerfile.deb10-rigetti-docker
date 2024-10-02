@@ -1,0 +1,67 @@
+FROM rigetti/forest:3.3.2
+# pyQuil+Rigetti  + Qiskit +Jupyter +  q-convert
+# https://docs.rigetti.com/qcs/getting-started/forest-docker-image
+# https://github.com/rigetti/pyquil/blob/master/Dockerfile
+# use-case instruction is at the bottom
+
+# time podman build -f Dockerfile.deb10-rigetti -t balewski/deb10-rigetti:p0  .
+# docker run -it balewski/ubu20-tket:v1   /bin/bash
+# To allow X11 to pop-up execute once on Mac OS, repeat it after every reboot of Mac OS.
+# xhost + 127.0.0.1
+# podman run -it -e DISPLAY=host.docker.internal:0  --user balewski  --volume /Users/balewski/docker_volumes/quantumMind:/quantumMind  --workdir /quantumMind/Rigetti  balewski/ubu20-quil-rigetti:v2    /bin/bash
+#   
+#         docker exec -it 07d15850b9c2 bash
+#         docker login
+#         docker ps -a
+#         docker commit -m "ubuntu20 TKET+QTuum" -a "Jan Balewski" a7xx balewski/xxx:d
+#         time docker push  balewski/ubu20-tket-qtuum:v1
+#   at NERSC Image was pulled w/ command:   shifterimg pull balewski/ubu20-tket-qtuum:v1
+
+# is needed by   one of libs 
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/Los_Angeles
+
+RUN echo 1a-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA  OS update   && \
+    apt-get update && \
+    apt-get install -y  locales autoconf automake gcc g++ make vim wget  ssh  openssh-server sudo   git emacs aptitude build-essential xterm python3-pip   python3-tk python3-scipy python3-dev iputils-ping net-tools screen feh hdf5-tools python3-bitstring mlocate  nodejs npm  && \
+    apt-get clean all
+# notes: python3-tk instals TK for matplotlib to display graphic on Cori
+
+RUN echo 2a-QQQ   universal quantum circuit converter &&\
+    npm -g install q-convert
+#
+RUN echo 2a-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA   python libs  && \
+    pip3 install --upgrade pip && \
+    pip3 install matplotlib h5py ruamel.yaml  scipy   qiskit  qiskit-experiments jupyter notebook  bitstring  
+
+RUN echo 1b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA   python libs  && \
+    pip3 install  --upgrade Pillow    
+# notes: Pillow is needed by matplotlib backend 'TkAgg' 
+
+
+
+RUN    echo 2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA   fix numpy   && \
+    pip3 uninstall   -y numpy
+RUN   pip3 install  numpy 
+
+RUN echo 2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA   python libs  && \
+    pip3 install qiskit-rigetti 
+
+# install instruction
+RUN echo 2e-CCCCCCCCCC    QCS CLI is a tool for interacting with QCS from the command line && \
+    curl -s "https://qcs-cli.s3-us-west-2.amazonaws.com/latest/linux/install" | bash
+run  rm /usr/local/bin/qcs && \
+     cp /root/.qcs/bin/qcs /usr/local/bin/qcs
+
+RUN echo 4b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA add balewski   && \
+ adduser --disabled-password  --gecos ""   balewski
+
+RUN echo 4-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA add balewski as @ NERSC  && \
+    groupadd --gid 1031480 balewski   && \
+    usermod -aG sudo balewski
+
+
+# User instruction
+# quantum circuit conversion:  https://www.npmjs.com/package/q-convert
+# q-convert -i circQFT_3Q.qasm -s qasm -o my_circuit.ipynb -d pyquil -j
+# q-convert -i qbart_fourZeros.qasm  -s qasm -o qbart_fourZeros.svg -d svg   ( display circ)

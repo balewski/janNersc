@@ -1,0 +1,17 @@
+FROM ubuntu:24.04
+# example of Docker image w/ X11-graphic
+
+# time podman build -f Dockerfile.ubu24-xeyes -t balewski/ubu24-xeyes:p1  .	
+
+
+RUN echo 1-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA  OS update   && \
+    apt-get update && \
+    apt-get install -y  xterm python3-pip    x11-apps && \
+    apt-get clean all
+    
+RUN apt-get install -y  locales 
+
+
+# use case
+# start container in the background:   podman run -it   --user $(id -u):$(id -g)  balewski/ubu22-xeyes:p1
+#Check:   xeyes

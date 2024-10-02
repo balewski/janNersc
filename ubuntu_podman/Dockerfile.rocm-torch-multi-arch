@@ -1,0 +1,31 @@
+FROM  rocm/pytorch:rocm4.5.2_ubuntu18.04_py3.8_pytorch_staging
+# example of Docker image w/ X11-graphic
+
+# on laptop:
+#    Build only for amd64 (AMD), takes ~20 min 
+#    time docker build  -f Dockerfile.rocm-torch -t balewski/rocm-torch:v1_amd64 .
+#    build only for ppc64le (IBM), takes ~7 min,  image is pushed to dockerhub instantly ~12 min
+#    time docker buildx build --rm  --push -f Dockerfile.rocm-blank  --platform linux/ppc64le  -t balewski/rocm-blank:v1_ppc64le .
+#         xhost + 127.0.0.1
+#         docker run -it -e DISPLAY=host.docker.internal:0  balewski/ubu20-blank:v1   /bin/bash
+#          docker exec -it 07d15850b9c2 bash
+
+#          docker login
+#         docker ps -a
+#         docker commit -m "ubuntu20 LTE+Jupyter" -a "Jan Balewski" a7xx balewski/xxx:d
+#         docker push balewski/rocm-torch:v1_amd64
+
+# is needed by  tzdada which sets sth for one of libs in section 2
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/Los_Angeles
+
+RUN echo 1-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA  OS update   && \
+    apt-get update && \
+    apt-get install -y  locales autoconf automake gcc g++ make vim wget gfortran ssh git emacs aptitude build-essential xterm python3-pip iputils-ping net-tools screen graphviz  tzdata x11-apps && \
+    apt-get clean all
+
+
+RUN echo 2-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA   python libs  && \
+    pip3 install --upgrade pip && \
+    pip install  h5py ruamel.yaml
+
