@@ -1,78 +1,52 @@
-FROM ubuntu:22.04
+
 # TKET + Qiskit +Jupyter+Quantinnum
 # instruction  https://github.com/CQCL/tket
 # use-case instruction is at the bottom
 
 # time python3 -c 'import qiskit'
 
-# time podman build -f Dockerfile.ubu22-tket-qtuum -t balewski/ubu22-tket-qtuum:p4   .
+# time podman build -f Dockerfile.ubu22-tket-qtuum -t balewski/ubu22-tket-qtuum:p4c .
 
-# docker run -it balewski/ubu20-tket:v1   /bin/bash
+FROM ubuntu:22.04
 
-#   
-#         docker exec -it 07d15850b9c2 bash
-#         docker login
-#         docker ps -a
-#         docker commit -m "ubuntu20 TKET+QTuum" -a "Jan Balewski" a7xx balewski/xxx:d
-#         time docker push  balewski/ubu20-tket-qtuum:v1
-#   at NERSC Image was pulled w/ command:   shifterimg pull balewski/ubu20-tket-qtuum:v1
-
-# is needed by   one of libs 
+# Set non-interactive frontend and timezone
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Los_Angeles
 
-RUN echo 1-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA  OS update   && \
+# Install OS packages
+RUN echo "1- Installing OS packages" && \
     apt-get update && \
-    apt-get install -y  locales autoconf automake gcc g++ make vim wget  ssh  openssh-server sudo   git emacs aptitude build-essential xterm python3-pip   python3-tk python3-scipy python3-dev iputils-ping net-tools screen  graphviz  graphviz-dev feh hdf5-tools  x11-apps && \
-    apt-get clean all
-# python3-bitstring
+    apt-get install -y locales autoconf automake gcc g++ make vim wget ssh openssh-server sudo git emacs aptitude \
+    build-essential xterm python3-pip python3-tk python3-scipy python3-dev iputils-ping net-tools screen graphviz \
+    graphviz-dev feh hdf5-tools x11-apps libdbus-1-dev libdbus-glib-1-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# notes: python3-tk instals TK for matplotlib to display graphic on Cori
-RUN echo 2a-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA   python libs  && \
-    pip3 install  --upgrade Pillow    
-# notes: Pillow is needed by matplotlib backend 'TkAgg' 
-
-RUN echo 2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA  generic  python libs  && \
+# Upgrade pip3 and install Pillow
+RUN echo "2a- Installing Pillow" && \
     pip3 install --upgrade pip && \
-    pip3 install matplotlib h5py ruamel.yaml  scipy   jupyter notebook  scikit-learn
+    pip3 install --upgrade Pillow
 
-# note, pytket will install almost complete qiskit because I call : pytket-qiskit
-RUN echo 2c-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA   project specific python libs  && \
-    pip3 install  pytket pytket-qiskit qiskit-experiments  fastaparser \
-        kaleidoscope mapomatic  pylatexenc networkx[default,extra] graphviz pyzx  \
-        pytket-quantinuum   keyring  dbus-python pyjwt requests websockets nest_asyncio   #<== for Quantinuum
+# Install generic Python libraries
+RUN echo "2b- Installing generic Python libraries" && \
+    pip3 install matplotlib h5py scipy jupyter notebook scikit-learn
 
-RUN echo 2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA install keyrings.cryptfile for Quantinuum  && \
-    cd /usr/share  && \
-    git clone https://github.com/frispete/keyrings.cryptfile && \
-    cd keyrings.cryptfile &&\
-    pip3 install -e .
+# Install Qiskit 1.0 and its related packages
+RUN echo "2b- Installing Qiskit 1.0 libs" && \
+    pip3 install -c https://qisk.it/1-0-constraints \
+    qiskit[visualization]==1.2.2 qiskit-ibm-runtime==0.29 qiskit-machine-learning qiskit_ibm_experiment qiskit-aer qiskit-ionq
 
-RUN    echo 2e-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA   fix numpy   && \
-    pip3 uninstall   -y numpy 
-RUN   pip3 install   --force-reinstall numpy==1.23.4 bitstring==4.0.1
+# Install project-specific Python libraries
+RUN echo "2c- Installing project-specific Python libraries" && \
+    pip3 install pytket pytket-qiskit fastaparser kaleidoscope mapomatic pylatexenc 'networkx[default,extra]' \
+    graphviz pyzx pytket-quantinuum keyring dbus-python pyjwt requests websockets nest_asyncio
 
+# Install keyrings.cryptfile for Quantinuum
+RUN echo "2d- Installing keyrings.cryptfile" && \
+    git clone https://github.com/frispete/keyrings.cryptfile /usr/share/keyrings.cryptfile && \
+    pip3 install -e /usr/share/keyrings.cryptfile && \
+    rm -rf /usr/share/keyrings.cryptfile
 
-#to avoid:  partially initialized module 'qiskit' has no attribute '_accelerate'	
-RUN echo 2f-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA  more qiskit  && \
-    pip3 install qiskit --upgrade  && \
-    pip3 install qiskit-terra  --upgrade && \
-    pip3 install qiskit-ibm-runtime --upgrade
-    
-#     pip3 install qiskit-ibm-provider 
-     
-#RUN    pip3 uninstall -y qiskit-ibmq-provider
-RUN   pip3 install qermit qiskit-terra[qasm3-import]
-
-    
-ADD docker-entrypoint.sh /srv/docker-entrypoint.sh
-RUN  echo 6-AAAAAAAAAA ENTRYPOINT  && chmod a+x /srv/docker-entrypoint.sh
-ENTRYPOINT ["/srv/docker-entrypoint.sh"]
-
-# User instruction
-#  podman init  as rootful:   podman machine init --memory  20480 --cpus 5 --disk-size 2048  --rootful
-# start image with current user - see: docker_volumes/qcrank_wrk/qiskit_examples/laptop_balewski_podman.source
- 
-RUN  pip3  install qiskit-ionq   
-RUN pip3 install --upgrade qiskit-aer
-
+# Fix numpy and bitstring versions
+RUN echo "2e- Fixing numpy and bitstring versions" && \
+    pip3 uninstall -y numpy && \
+    pip3 install --force-reinstall numpy bitstring
