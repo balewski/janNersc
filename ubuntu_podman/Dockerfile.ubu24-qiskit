@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 # qiskit1.2 + QML + IonQ +Braket + pytorch+PennyLane_0.35 +  qbraid + LatexLive
 
-# time podman build -f Dockerfile.ubu24-qiskit -t balewski/ubu24-qiskit:p3c  .
+# time podman build -f Dockerfile.ubu24-qiskit -t balewski/ubu24-qiskit:p3e  .
 # PM: real      7m42.406s
 
 # podman commit  -a "Jan Balewski"  c3d48cf15876XXX  balewski/XXXkit-qml:p2ch
@@ -64,7 +64,8 @@ RUN echo "3b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA JAX" && \
 
 # Install qbraid, Amazon Braket SDK, and other final libraries
 RUN /opt/venv/bin/pip install qbraid amazon-braket-sdk mthree && \
-    /opt/venv/bin/pip uninstall -y qiskit-ibm-provider
+    /opt/venv/bin/pip uninstall -y qiskit-ibm-provider  && \
+    /opt/venv/bin/pip install stim
 
 #RUN apt-get install -y  locales  # tmp
 
