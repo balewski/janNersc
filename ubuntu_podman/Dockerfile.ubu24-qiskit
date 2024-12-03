@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 # qiskit1.2 + QML + IonQ +Braket + pytorch+PennyLane_0.35 +  qbraid + LatexLive
 
-# time podman build -f Dockerfile.ubu24-qiskit -t balewski/ubu24-qiskit:p3e  .
+# time podman build -f Dockerfile.ubu24-qiskit -t balewski/ubu24-qiskit:p3f  .
 # PM: real      7m42.406s
 
 # podman commit  -a "Jan Balewski"  c3d48cf15876XXX  balewski/XXXkit-qml:p2ch
@@ -35,7 +35,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Install Qiskit 1.0 and its related packages within the virtual environment
 RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit 1.0 libs" && \
-    /opt/venv/bin/pip install -c https://qisk.it/1-0-constraints qiskit[visualization]==1.2.2 qiskit-ibm-runtime==0.29 qiskit-machine-learning qiskit_ibm_experiment qiskit-aer qiskit-ionq
+    /opt/venv/bin/pip install -c https://qisk.it/1-0-constraints qiskit[visualization] qiskit-ibm-runtime qiskit-machine-learning qiskit_ibm_experiment qiskit-aer qiskit-ionq
+
+#old qiskit[visualization]==1.2.2 qiskit-ibm-runtime==0.29
 
 # Install ML and QML libraries
 RUN echo "2c-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA ML+QML libs" && \
