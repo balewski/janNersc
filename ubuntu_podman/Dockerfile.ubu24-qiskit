@@ -1,8 +1,9 @@
 FROM ubuntu:24.04
 # qiskit1.2 + QML + IonQ +Braket + pytorch+PennyLane_0.35 +  qbraid + LatexLive
 
-# time podman build -f Dockerfile.ubu24-qiskit -t balewski/ubu24-qiskit:p3f  .
+# time podman build -f Dockerfile.ubu24-qiskit -t balewski/ubu24-qiskit:p4c   .
 # PM: real      7m42.406s
+# if ???  add --network=host
 
 # podman commit  -a "Jan Balewski"  c3d48cf15876XXX  balewski/XXXkit-qml:p2ch
 # on laptop:
@@ -37,7 +38,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit 1.0 libs" && \
     /opt/venv/bin/pip install -c https://qisk.it/1-0-constraints qiskit[visualization] qiskit-ibm-runtime qiskit-machine-learning qiskit_ibm_experiment qiskit-aer qiskit-ionq
 
-#old qiskit[visualization]==1.2.2 qiskit-ibm-runtime==0.29
 
 # Install ML and QML libraries
 RUN echo "2c-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA ML+QML libs" && \
@@ -64,12 +64,22 @@ RUN echo "3b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA JAX" && \
     /opt/venv/bin/pip install -U "jax[cpu]" && \
     /opt/venv/bin/pip install jaxopt optax
 
-# Install qbraid, Amazon Braket SDK, and other final libraries
-RUN /opt/venv/bin/pip install qbraid amazon-braket-sdk mthree && \
-    /opt/venv/bin/pip uninstall -y qiskit-ibm-provider  && \
-    /opt/venv/bin/pip install stim
+# Ensure numpy is installed first
+#RUN /opt/venv/bin/pip install numpy
 
-#RUN apt-get install -y  locales  # tmp
+# Install qbraid, Amazon Braket SDK, and other final libraries
+RUN echo "3c-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Amazon Braket SDK " && \
+    /opt/venv/bin/pip install qbraid amazon-braket-sdk  && \
+    /opt/venv/bin/pip uninstall -y qiskit-ibm-provider  && \
+    /opt/venv/bin/pip install stim 
+
+RUN   /opt/venv/bin/pip install mapomatic
+# Ensure numpy is installed first
+#RUN /opt/venv/bin/pip install numpy
+#fails: RUN   /opt/venv/bin/pip install mthree
+
+
+# off: mthree
 
 # Final cleanup
 RUN apt-get clean
