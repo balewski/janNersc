@@ -1,0 +1,90 @@
+# x86-64 architecture
+# Use Ubuntu 24.04 as the base image
+FROM ubuntu:24.04
+# podman-hpc build -f Dockerfile.ubu24-x86-quandela -t balewski/ubu24-perceval:p2c   .
+
+# Set non-interactive mode for apt-get
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/Los_Angeles
+
+# Update the OS and install required packages
+RUN echo "Updating OS and installing required packages..." && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    locales \
+    autoconf \
+    automake \
+    gcc \
+    g++ \
+    make \
+    vim \
+    wget \
+    ssh \
+    openssh-server \
+    sudo \
+    git \
+    emacs \
+    aptitude \
+    build-essential \
+    xterm \
+    python3-pip \
+    python3-tk \
+    python3-scipy \
+    python3-dev \
+    iputils-ping \
+    net-tools \
+    screen \
+    feh \
+    hdf5-tools \
+    python3-bitstring \
+    plocate \
+    graphviz \
+    tzdata \
+    x11-apps \
+    python3-venv && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create a virtual environment for Python packages to avoid the externally managed environment issue
+RUN python3 -m venv /opt/venv
+
+# Activate the virtual environment
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install Qiskit 1.0 and its related packages within the virtual environment
+RUN echo "Installing Qiskit and related packages..." && \
+    /opt/venv/bin/pip install --no-cache-dir qiskit==1.3 qiskit[visualization] qiskit-ibm-runtime qiskit-machine-learning qiskit_ibm_experiment qiskit-aer qiskit-ionq
+
+# Install ML and QML libraries
+RUN echo "Installing ML and QML libraries..." && \
+    /opt/venv/bin/pip install --no-cache-dir scikit-learn pandas seaborn[stats] networkx[default] optuna
+
+# Install additional Python libraries
+RUN echo "Installing additional Python libraries..." && \
+    /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/venv/bin/pip install --no-cache-dir matplotlib h5py scipy jupyter notebook bitstring lmfit
+
+# Install Pillow for matplotlib backend 'TkAgg'
+RUN echo "Installing Pillow for matplotlib..." && \
+    /opt/venv/bin/pip install --no-cache-dir --upgrade Pillow
+
+# Install PennyLane, PyTorch, and other quantum computing-related libraries
+RUN echo "Installing PennyLane, PyTorch, and quantum computing libraries..." && \
+    /opt/venv/bin/pip install --no-cache-dir pennylane --upgrade && \
+    /opt/venv/bin/pip install --no-cache-dir pennylane-lightning pennylane-lightning[gpu] pennylane-sf pennylane-qiskit pennylane-cirq && \
+    /opt/venv/bin/pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && \
+    /opt/venv/bin/pip install --no-cache-dir torchsummary
+
+# Final cleanup
+RUN apt-get clean && rm -rf /tmp/* /var/tmp/*
+
+RUN /opt/venv/bin/pip install perceval-quandela
+
+# Set the default command to bash
+CMD ["/bin/bash"]
+
+
+# test
+#  podman-hpc run -it balewski/ubu24-perceval:p2c 
+# python3 -c "import perceval as pcvl; print(pcvl.__version__)"
+# >>> 0.12.0
