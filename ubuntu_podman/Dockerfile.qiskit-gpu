@@ -1,0 +1,16 @@
+FROM registry.nersc.gov/library/nersc/mpi4py:3.1.3
+
+RUN pip install qiskit-aer-gpu
+
+# podman-hpc build -f Dockerfile.qiskit-gpu -t $USER/qiskit-gpu:p1b
+# podman-hpc migrate $USER/qiskit-gpu:p1b
+# IMG=$USER/qiskit-gpu:p1b ;  podman-hpc run -it --gpu -e DISPLAY  -v $HOME:$HOME -e HOME  $IMG  bash
+#  salloc -N 1 -t 20 -C gpu -q debug -A nstaff
+# srun -n 4 podman-hpc run --rm --gpu --mpi $IMG  python3 -m mpi4py.bench helloworld
+
+
+# pip list |grep qis
+# qiskit                   1.2.4      
+# qiskit-aer-gpu           0.15.1    
+
+# Longer instruction:  https://docs.google.com/document/d/1q3UdKg9zb6nOWn1a7wa433Z7Es7BlcMiQyBf95jBFgw/edit?usp=sharing
