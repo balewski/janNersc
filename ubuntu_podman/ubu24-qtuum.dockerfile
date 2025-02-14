@@ -12,12 +12,8 @@ ENV TZ=America/Los_Angeles
 # Update the OS and install required packages
 RUN echo "1a-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA OS update" && \
     apt-get update && \
-    apt-get install -y locales autoconf automake gcc g++ make vim wget ssh openssh-server sudo git emacs aptitude build-essential xterm python3-pip python3-tk python3-scipy python3-dev iputils-ping net-tools screen feh hdf5-tools python3-bitstring plocate graphviz tzdata x11-apps python3-venv dnsutils iputils-ping libomp-dev && \
+    apt-get install -y locales autoconf automake gcc g++ make vim wget ssh openssh-server sudo git emacs aptitude build-essential xterm python3-pip python3-tk python3-scipy python3-dev iputils-ping net-tools screen feh hdf5-tools python3-bitstring plocate graphviz tzdata x11-apps python3-venv dnsutils iputils-ping libgomp1 && \
     apt-get clean
-
-# latex install takes a long time
-#RUN echo "1b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA TeX Live " && \
-#    apt-get install -y texlive-full texlive-latex-extra texlive-science texlive-fonts-recommended dvipng 
 
 # Create a virtual environment for Python packages to avoid the externally managed environment issue
 RUN python3 -m venv /opt/venv

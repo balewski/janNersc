@@ -1,6 +1,6 @@
 FROM ubuntu:24.04
 
-# time podman build -f Dockerfile.ubu24-braket-quera -t balewski/ubu24-braket-quera:p1
+# time podman build -f ubu24-braket-quera.dockerfile  -t balewski/ubu24-braket-quera:p1b
 # PM: 
 
 # AWS=Braket + Qiskit +Jupyter+QuEra
