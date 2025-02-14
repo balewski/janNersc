@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 # qiskit1.2 + QML + IonQ +Braket + pytorch+PennyLane_0.35 +  qbraid + LatexLive
 
-# time podman build  --network=host -f Dockerfile.ubu24-qiskit -t balewski/ubu24-qiskit:p5b   .
+# time podman build  --network=host -f Dockerfile.ubu24-qiskit -t balewski/ubu24-qiskit:p5c   
 # PM: real      7m42.406s
 # if ???  add --network=host
 
@@ -21,7 +21,7 @@ ENV TZ=America/Los_Angeles
 # Update the OS and install required packages
 RUN echo "1a-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA OS update" && \
     apt-get update && \
-    apt-get install -y locales autoconf automake gcc g++ make vim wget ssh openssh-server sudo git emacs aptitude build-essential xterm python3-pip python3-tk python3-scipy python3-dev iputils-ping net-tools screen feh hdf5-tools python3-bitstring plocate graphviz tzdata x11-apps python3-venv && \
+    apt-get install -y locales autoconf automake gcc g++ make vim wget ssh openssh-server sudo git emacs aptitude build-essential xterm python3-pip python3-tk python3-scipy python3-dev iputils-ping net-tools screen feh hdf5-tools python3-bitstring plocate graphviz tzdata x11-apps python3-venv dnsutils iputils-ping && \
     apt-get clean
 
 # latex install takes a long time

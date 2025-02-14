@@ -5,7 +5,7 @@
 
 # time python3 -c 'import qiskit'
 
-# time podman build -f Dockerfile.ubu22-tket-qtuum -t balewski/ubu22-tket-qtuum:p4c .
+# time podman build -f Dockerfile.ubu22-tket-qtuum -t balewski/ubu22-tket-qtuum:p4d .
 
 FROM ubuntu:22.04
 
@@ -36,9 +36,29 @@ RUN echo "2b- Installing Qiskit 1.0 libs" && \
     qiskit[visualization]==1.2.2 qiskit-ibm-runtime==0.29 qiskit-machine-learning qiskit_ibm_experiment qiskit-aer qiskit-ionq
 
 # Install project-specific Python libraries
+#RUN echo "2c- Installing project-specific Python libraries" && \
+#    pip3 install pytket pytket-qiskit fastaparser kaleidoscope mapomatic pylatexenc 'networkx[default,extra]' \
+#    graphviz pyzx pytket-quantinuum keyring dbus-python pyjwt requests websockets nest_asyncio
+
 RUN echo "2c- Installing project-specific Python libraries" && \
-    pip3 install pytket pytket-qiskit fastaparser kaleidoscope mapomatic pylatexenc 'networkx[default,extra]' \
-    graphviz pyzx pytket-quantinuum keyring dbus-python pyjwt requests websockets nest_asyncio
+    pip3 install --no-cache-dir \
+    pytket==1.40.0 \
+    pytket-qiskit \
+    fastaparser \
+    kaleidoscope \
+    mapomatic \
+    pylatexenc \
+    'networkx[default,extra]' \
+    graphviz \
+    pyzx \
+    pytket-quantinuum==0.40.0 \
+    keyring \
+    dbus-python \
+    pyjwt \
+    requests \
+    websockets \
+    nest_asyncio
+
 
 # Install keyrings.cryptfile for Quantinuum
 RUN echo "2d- Installing keyrings.cryptfile" && \
