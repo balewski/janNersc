@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 # qiskit1.2
 
-# podman build  -f ubu24-casual-net.dockerfile -t balewski/casual-net:p1a .
+# podman build  -f ubu24-casual-net.dockerfile -t balewski/casual-net:p1k .
 # on PM use 'podman-hpc' instead of 'podman' and all should work
 # additionaly do 1 time: podman-hpc migrate balewski/ubuXX-qiskit-qml:p1
 
@@ -22,8 +22,14 @@ RUN python3 -m venv /opt/venv
 # Activate the virtual environment
 ENV PATH="/opt/venv/bin:$PATH"
 
-RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA  python libs" && \
-    /opt/venv/bin/pip install  scikit-learn
+# Install ML  libraries
+RUN echo "2c-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA math libs" && \
+    /opt/venv/bin/pip install scikit-learn pandas seaborn[stats] networkx[default] tqdm
+
+# Install additional Python libraries
+RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install matplotlib h5py scipy jupyter notebook bitstring lmfit pytest
 
 # Final cleanup
 RUN apt-get clean
