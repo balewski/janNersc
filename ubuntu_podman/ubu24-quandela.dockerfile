@@ -1,9 +1,7 @@
 FROM ubuntu:24.04
-# Quantinuum
+# Quandela  - on MacOS needs to be compiled as amd64 & then it works
 
-# podman build   -f ubu24-qtuum.dockerfile -t balewski/ubu24-qtuum:p1h   --platform linux/arm64   
-# PM: real      7m42.406s
-# for omp_get_num_threads:  #      -e LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1 \
+# podman build -f ubu24-quandela.dockerfile -t balewski/ubu24-perceval:p2d   --platform linux/arm64   
 
 
 # Set non-interactive mode for apt-get
@@ -34,13 +32,10 @@ RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
 
 # Quantinuum libs
 # Upgrade pip and install necessary Python packages
-RUN pip install --upgrade pip wheel setuptools
+#RUN pip install --upgrade pip wheel setuptools
 
 # Install pytket and the Quantinuum extension
-RUN pip install pytket pytket-quantinuum qnexus pytket-qiskit qiskit-aer
-
-# Install pyqir
-RUN pip install pyqir
+RUN pip install  perceval-quandela
 
 
 # Final cleanup
@@ -48,3 +43,7 @@ RUN apt-get clean
 
 # Set the default command to bash
 CMD ["/bin/bash"]
+
+# test
+# python3 -c "import perceval as pcvl; print(pcvl.__version__)"
+# >>> 0.12.1
