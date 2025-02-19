@@ -31,6 +31,11 @@ RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
     /opt/venv/bin/pip install --upgrade pip && \
     /opt/venv/bin/pip install matplotlib h5py scipy jupyter notebook bitstring lmfit pytest
 
+# Install MPI and mpi4py
+RUN echo "2e-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA mpi4py" && \
+    apt-get install -y libopenmpi-dev openmpi-bin && \
+    /opt/venv/bin/pip install mpi4py
+    
 # Final cleanup
 RUN apt-get clean
 
