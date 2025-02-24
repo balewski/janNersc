@@ -30,12 +30,12 @@ RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit  libs" && \
     /opt/venv/bin/pip install qiskit>=1.3 qiskit[visualization] qiskit-ibm-runtime  qiskit-aer 
 
 # add IQM software
-RUN /opt/venv/bin/pip install   qiskit-iqm  iqm-client
+RUN /opt/venv/bin/pip install   qiskit-iqm  "iqm-client<=21"
 
 # Install additional Python libraries
-#RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
-#    /opt/venv/bin/pip install --upgrade pip && \
-#    /opt/venv/bin/pip install matplotlib h5py scipy jupyter notebook bitstring lmfit pytest networkx rustworkx pylatexenc  
+RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install matplotlib h5py scipy jupyter notebook bitstring lmfit pytest networkx rustworkx pylatexenc  
 
 
 # Final cleanup
