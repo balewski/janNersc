@@ -1,7 +1,4 @@
-FROM ubuntu:24.04
-# qiskit1.2
-
-# podman-hpc build  -f ubu24-casual-net.dockerfile -t balewski/casual-net:p1l .
+# podman-hpc build  -f ubu24-casual-net.dockerfile -t balewski/casual-net:p2a .
 # on PM use 'podman-hpc' instead of 'podman' and all should work
 # additionaly do 1 time:  podman-hpc migrate balewski/casual-net:p1k
 
@@ -9,35 +6,71 @@ FROM ubuntu:24.04
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Los_Angeles
 
-# Update the OS and install required packages
-RUN echo "1a-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA OS update" && \
-    apt-get update && \
-    apt-get install -y locales autoconf automake gcc g++ make vim wget ssh openssh-server sudo git emacs aptitude build-essential xterm python3-pip python3-tk python3-scipy python3-dev iputils-ping net-tools screen feh hdf5-tools python3-bitstring plocate graphviz tzdata x11-apps python3-venv dnsutils iputils-ping   && \
-    apt-get clean
+FROM nvcr.io/nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
+WORKDIR /opt
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN \
+    apt-get update        &&   \   
+    apt-get install --yes      \   
+        build-essential autoconf cmake flex bison zlib1g-dev   \   
+        fftw-dev fftw3 apbs libicu-dev libbz2-dev libgmp-dev   \   
+        bc libblas-dev liblapack-dev git libtool swig uuid-dev \
+        libfftw3-dev automake lsb-core libxc-dev libgsl-dev    \   
+        unzip libhdf5-serial-dev ffmpeg libcurl4-openssl-dev   \   
+        libedit-dev libyaml-cpp-dev make libquadmath0 gfortran \
+        python3-yaml automake pkg-config libc6-dev libzmq3-dev \
+        libjansson-dev liblz4-dev libarchive-dev python3-pip   \   
+        libsqlite3-dev lua5.1 liblua5.1-dev lua-posix jq opam  \   
+        python3-dev python3-cffi python3-ply python3-sphinx    \   
+        aspell aspell-en valgrind libyaml-cpp-dev wget vim     \   
+        make libzmq3-dev python3-yaml time valgrind  libeigen3-dev \
+        ocaml ocamlbuild ocaml-findlib indent libnum-ocaml libnum-ocaml-dev \
+        fig2dev texinfo ghostscript                            \   
+        mlocate python3-jsonschema python-is-python3         &&\ 
+    apt-get clean all 
 
 
-# Create a virtual environment for Python packages to avoid the externally managed environment issue
-RUN python3 -m venv /opt/venv
+WORKDIR /opt
+ARG mpich=4.2.2
+ARG mpich_prefix=mpich-$mpich
+RUN \
+    wget https://www.mpich.org/static/downloads/$mpich/$mpich_prefix.tar.gz && \
+    tar xvzf $mpich_prefix.tar.gz                                           && \
+    cd $mpich_prefix                                                        && \
+    ./configure FFLAGS=-fallow-argument-mismatch FCFLAGS=-fallow-argument-mismatch \
+    --prefix=/opt/mpich/install                                             && \
+    make -j 16                                                              && \
+    make install                                                            && \
+    make clean                                                              && \
+    cd ..                                                                   && \
+    rm -rf $mpich_prefix.tar.gz
+ENV PATH=$PATH:/opt/mpich/install/bin
+ENV PATH=$PATH:/opt/mpich/install/include
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/mpich/install/lib
+RUN /sbin/ldconfig
 
-# Activate the virtual environment
-ENV PATH="/opt/venv/bin:$PATH"
+ENV PATH=$PATH:/usr/local/cuda/lib64/stubs
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64/stubs
+ENV PATH=$PATH:/usr/local/cuda-11.8/targets/x86_64-linux/lib/stubs
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-11.8/targets/x86_64-linux/lib/stubs
 
-# Install ML  libraries
-RUN echo "2c-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA math libs" && \
-    /opt/venv/bin/pip install scikit-learn pandas seaborn[stats] networkx[default] tqdm
+RUN ln -s /usr/local/cuda-11.8/targets/x86_64-linux/lib/stubs/libnvidia-ml.so /usr/local/cuda-11.8/targets/x86_64-linux/lib/stubs/libnvidia-ml.so.1 
 
-# Install additional Python libraries
-RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
-    /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install matplotlib h5py scipy jupyter notebook bitstring lmfit pytest
+#Install HWLOC
+WORKDIR /opt 
+RUN git clone -b v2.11 https://github.com/open-mpi/hwloc.git hwloc          && \
+    cd hwloc                                                                && \
+    ./autogen.sh                                                            && \
+    ./configure                                                             && \
+    make -j 16                                                              && \
+    make install 
 
-# Install MPI and mpi4py
-#RUN echo "2e-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA mpi4py" && \
-#    apt-get install -y libopenmpi-dev openmpi-bin && \
-#    /opt/venv/bin/pip install mpi4py
 
-#RUN  apt-get install -y  xterm python3-pip    x11-apps
-
+RUN pip install setuptools numpy
+RUN python -m pip install mpi4py -i https://pypi.anaconda.org/mpi4py/simple
+RUN pip install matplotlib pytest flake8 cython sphinx-gallery sphinx-rtd-theme
+RUN pip install h5py scikit-learn
 # Final cleanup
 RUN apt-get clean
  
