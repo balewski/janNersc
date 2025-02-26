@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 # optimized to IQM access
 
-#  podman build  --network=host -f ubu24-iqm.dockerfile -t balewski/ubu24-iqm:p1a     --platform linux/arm64   
+#  podman build  --network=host -f ubu24-iqm.dockerfile -t balewski/ubu24-iqm:p1c     --platform linux/arm64   
 #   --platform linux/amd64   works w/o LD_PRELOAD  but generates WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
 # for omp_get_num_threads:  #      -e LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1 \
 # on PM use 'podman-hpc' instead of 'podman' and all should work
@@ -27,7 +27,10 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Install Qiskit 1.0 and its related packages within the virtual environment
 RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit  libs" && \
-    /opt/venv/bin/pip install qiskit qiskit[visualization] qiskit-ibm-runtime  qiskit-aer  qiskit_qasm3_import qiskit-iqm 
+    /opt/venv/bin/pip install qiskit>=1.3 qiskit[visualization] qiskit-ibm-runtime  qiskit-aer 
+
+# add IQM software
+RUN /opt/venv/bin/pip install   qiskit-iqm  "iqm-client<=21"
 
 # Install additional Python libraries
 RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
