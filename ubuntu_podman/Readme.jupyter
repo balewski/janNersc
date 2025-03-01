@@ -1,0 +1,27 @@
+- - - How to start JNB w/o browser inside podman image on PM and connect to it
+from the browser on remote laptop - - - - 
+
+The image  must  Jupyter installed
+pip install  jupyter notebook 
+
+You must change your ssh to pm  open port , this is portion of my ssh config:
+Host pm-jnb
+  Hostname    perlmutter.nersc.gov
+  LocalForward  9800 localhost:9800
+  
+After you are on PM (using the above), you start podman-hpc image 
+
+On PM you start the image using your normal: . pm_martin.source
+and then inside the running image you do this 2 commands:
+
+cd dirWithNotebooks
+jupyter notebook --ip 0.0.0.0 --no-browser --allow-root --port 9800
+( you can use a different port - thy just need to match)
+This will print several lines , the last one will be with 127.0.0.1
+>>>http://127.0.0.1:9600/tree?token=7d0fbe92e0b2c3f29c5f16b48fbadb6f084806dfe60ec8d6
+
+Go back to your laptop, and paste this line into your local browser - this will connect you to Jupyter deamon running on PM inside podman-hpc imag
+
+Note,
+* you may need to use  '--network host' when starting podman-hpc iamge
+* the port you specified when doing ssh pm is blocked on given login node (for all nersc users!). So if sth die and you want to restart the whole process logout/login to PM again to get different logion
