@@ -1,6 +1,7 @@
 FROM ubuntu:24.04
 
-# time podman build -f ubu24-braket-quera.dockerfile  -t balewski/ubu24-braket-quera:p1b
+# time podman build -f ubu24-braket-quera.dockerfile  -t balewski/ubu24-braket-quera:p1c     
+
 # PM: 
 
 # AWS=Braket + Qiskit +Jupyter+QuEra
@@ -32,7 +33,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN echo "2b- Installing generic Python libraries" && \
     pip install --no-cache-dir matplotlib h5py  scipy jupyter notebook scikit-learn bitstring==4.0.1
 
-#spare: ruamel.yaml
 
 # Install Qiskit-specific libraries
 RUN echo "2c- Installing Qiskit-specific libraries" && \
