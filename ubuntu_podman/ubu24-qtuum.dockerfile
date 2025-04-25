@@ -40,8 +40,9 @@ RUN pip install --upgrade pip wheel setuptools
 RUN pip install pytket pytket-quantinuum qnexus pytket-qiskit qiskit-aer
 
 # Install pyqir
-RUN pip install pyqir
+RUN pip install pyqir  
 
+#RUN apt-get install -y     x11-apps 
 
 # Final cleanup
 RUN apt-get clean
