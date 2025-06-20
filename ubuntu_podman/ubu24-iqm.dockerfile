@@ -7,7 +7,6 @@ FROM ubuntu:24.04
 # on PM use 'podman-hpc' instead of 'podman' and all should work
 # additionaly do 1 time: podman-hpc migrate balewski/ubuXX-qiskit-qml:p1
 
-
 # Set non-interactive mode for apt-get
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Los_Angeles
@@ -25,19 +24,14 @@ RUN python3 -m venv /opt/venv
 # Activate the virtual environment
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Qiskit 1.0 and its related packages within the virtual environment
+# Install Qiskit 1.0, IQM-Client, and related packages within the virtual environment
 RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit  libs" && \
-    /opt/venv/bin/pip install "qiskit<1.3" qiskit[visualization] qiskit-ibm-runtime  qiskit-aer 
-
-# add IQM software
-#RUN /opt/venv/bin/pip install   qiskit-iqm  "iqm-client<=23.5"
-RUN /opt/venv/bin/pip install   qiskit-iqm  "iqm-client>=23.5,<24.0"
+    /opt/venv/bin/pip install "qiskit<1.3" "qiskit[visualization]" qiskit-ibm-runtime qiskit-aer "iqm-client[qiskit]==28.0.0"
 
 # Install additional Python libraries
 RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
     /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install matplotlib h5py scipy jupyter notebook bitstring lmfit pytest networkx rustworkx pylatexenc  
-
+    /opt/venv/bin/pip install matplotlib h5py scipy jupyter notebook bitstring lmfit pytest networkx rustworkx pylatexenc
 
 # Final cleanup
 RUN apt-get clean
