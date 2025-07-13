@@ -1,6 +1,6 @@
 FROM ubuntu:24.04
 
-#  podman build  --network=host -f ubu24-qiskit.dockerfile -t balewski/ubu24-qiskit:p7a     --platform linux/arm64   
+#  podman build  --network=host -f ubu24-qiskit.dockerfile -t balewski/ubu24-qiskit:p7c     --platform linux/arm64   
 #   --platform linux/amd64   works w/o LD_PRELOAD  but generates WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
 # for omp_get_num_threads:  #      -e LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1 \
 # on PM use 'podman-hpc' instead of 'podman' and all should work
@@ -26,7 +26,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Install Qiskit 1.0 and its related packages within the virtual environment
 RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit  libs" && \
-    /opt/venv/bin/pip install qiskit qiskit[visualization] qiskit-ibm-runtime qiskit-machine-learning qiskit_ibm_experiment qiskit-aer qiskit-ionq qiskit_qasm3_import
+    /opt/venv/bin/pip install qiskit qiskit[visualization] qiskit-ibm-runtime  qiskit-aer
+
+# OLD qiskit-machine-learning qiskit_ibm_experiment  qiskit_qasm3_import  qiskit-ionq
 
 # Install additional Python libraries
 RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
