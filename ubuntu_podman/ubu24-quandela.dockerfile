@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 # Quandela  - on MacOS needs to be compiled as amd64 & then it works
 
-# podman build -f ubu24-quandela.dockerfile -t balewski/ubu24-perceval:p2d   --platform linux/arm64   
+# podman build -f ubu24-quandela.dockerfile -t balewski/ubu24-perceval:p2f   --platform linux/arm64   
 
 
 # Set non-interactive mode for apt-get
@@ -30,11 +30,6 @@ RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
     /opt/venv/bin/pip install --upgrade pip && \
     /opt/venv/bin/pip install matplotlib h5py scipy jupyter notebook bitstring lmfit pytest
 
-# Quantinuum libs
-# Upgrade pip and install necessary Python packages
-#RUN pip install --upgrade pip wheel setuptools
-
-# Install pytket and the Quantinuum extension
 RUN pip install  perceval-quandela
 
 
