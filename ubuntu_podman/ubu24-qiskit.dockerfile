@@ -1,6 +1,6 @@
 FROM ubuntu:24.04
 
-#  podman build  --network=host -f ubu24-qiskit.dockerfile -t balewski/ubu24-qiskit:p7j   --platform linux/arm64   
+#  podman build  --network=host -f ubu24-qiskit.dockerfile -t balewski/ubu24-qiskit:p7k   --platform linux/arm64   
 #   --platform linux/amd64   works w/o LD_PRELOAD  but generates WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
 # for omp_get_num_threads:  #      -e LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1 \
 # on PM use 'podman-hpc' instead of 'podman' and all should work
@@ -25,15 +25,15 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Install Qiskit 1.0 and its related packages within the virtual environment
-#OLD RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit  libs" && \
-#OLD    /opt/venv/bin/pip install qiskit qiskit[visualization] qiskit-ibm-runtime  qiskit-aer qiskit-ibm-catalog
+RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit  libs" && \
+     /opt/venv/bin/pip install --upgrade "qiskit[visualization,ibm]" qiskit_ibm_runtime
 
-RUN echo "Installing Qiskit with visualization + IBM extras + Catalog + Serverless" && \
-    /opt/venv/bin/pip install --upgrade "qiskit[visualization,ibm]" qiskit-ibm-catalog qiskit-serverless
-  
 
 # QSP project w/ Kabir
 RUN /opt/venv/bin/pip install pyqsp pandas  openpyxl
+
+# Q-CTRL
+RUN /opt/venv/bin/pip install fire-opal  qctrl-visualizer 
 
 # OLD qiskit-machine-learning qiskit_ibm_experiment  qiskit_qasm3_import  qiskit-ionq
 
