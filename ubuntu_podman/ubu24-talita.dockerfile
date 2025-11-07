@@ -1,6 +1,6 @@
 FROM ubuntu:24.04
 
-#  podman build  --network=host -f ubu24-qiskit.dockerfile -t balewski/ubu24-qiskit:p7n   --platform linux/arm64   
+#  podman build  --network=host -f ubu24-latex.container -t balewski/ubu24latex:p1   --platform linux/arm64   
 #   --platform linux/amd64   works w/o LD_PRELOAD  but generates WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
 # for omp_get_num_threads:  #      -e LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1 \
 # on PM use 'podman-hpc' instead of 'podman' and all should work
@@ -24,20 +24,6 @@ RUN python3 -m venv /opt/venv
 # Activate the virtual environment
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Qiskit  and its related packages within the virtual environment
-RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit  libs" && \
-     /opt/venv/bin/pip install --upgrade "qiskit[visualization,ibm]" qiskit_ibm_runtime qiskit-aer
-
-# QSP project w/ Kabir
-RUN /opt/venv/bin/pip install pyqsp pandas  openpyxl
-
-# Q-CTRL
-RUN /opt/venv/bin/pip install fire-opal  qctrl-visualizer 
-
-# IonQ
-RUN /opt/venv/bin/pip install  qiskit-ionq
-
-# OLD qiskit-machine-learning qiskit_ibm_experiment  qiskit_qasm3_import
 
 # Install additional Python libraries
 RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \

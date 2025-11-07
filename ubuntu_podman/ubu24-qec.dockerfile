@@ -1,6 +1,6 @@
 FROM ubuntu:24.04
 
-#  podman build  --network=host -f ubu24-qiskit.dockerfile -t balewski/ubu24-qiskit:p7n   --platform linux/arm64   
+#  podman build  --network=host -f ubu24-qec.dockerfile -t balewski/ubu24-qec:p1e   --platform linux/arm64   
 #   --platform linux/amd64   works w/o LD_PRELOAD  but generates WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
 # for omp_get_num_threads:  #      -e LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1 \
 # on PM use 'podman-hpc' instead of 'podman' and all should work
@@ -28,21 +28,24 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit  libs" && \
      /opt/venv/bin/pip install --upgrade "qiskit[visualization,ibm]" qiskit_ibm_runtime qiskit-aer
 
-# QSP project w/ Kabir
-RUN /opt/venv/bin/pip install pyqsp pandas  openpyxl
+#  Quantum error corrections tools
+# Clone Stim
+RUN git clone https://github.com/quantumlib/Stim.git /stim
 
-# Q-CTRL
-RUN /opt/venv/bin/pip install fire-opal  qctrl-visualizer 
+# (Option A) Install the Python package (includes C++ core build)
+RUN /opt/venv/bin/pip install /stim
 
-# IonQ
-RUN /opt/venv/bin/pip install  qiskit-ionq
+# (Option B) Build just the CLI binary - not working
+#RUN cd /stim && cmake -B build && cmake --build build --target stim && \
+#     cp build/stim /usr/local/bin/stim
 
-# OLD qiskit-machine-learning qiskit_ibm_experiment  qiskit_qasm3_import
+RUN /opt/venv/bin/pip install  pymatching sinter
+
 
 # Install additional Python libraries
 RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
     /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install matplotlib h5py scipy jupyter notebook bitstring lmfit pytest scikit-learn networkx[default]
+    /opt/venv/bin/pip install matplotlib h5py scipy jupyter notebook bitstring lmfit pytest scikit-learn networkx[default]   pandas 
 
 
 # Final cleanup

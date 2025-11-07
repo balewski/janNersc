@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 # Quandela  - on MacOS needs to be compiled as amd64 & then it works
 
-# podman build -f ubu24-quandela.dockerfile -t balewski/ubu24-perceval:p2f   --platform linux/arm64   
+# podman build -f ubu24-quandela.dockerfile -t balewski/ubu24-perceval:p2g   --platform linux/arm64   
 
 
 # Set non-interactive mode for apt-get
