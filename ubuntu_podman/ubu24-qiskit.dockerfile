@@ -1,7 +1,8 @@
 FROM ubuntu:24.04
 
-#  podman build  --network=host -f ubu24-qiskit.dockerfile -t balewski/ubu24-qiskit:p7o   --platform linux/arm64   
+#  podman build  --network=host -f ubu24-qiskit.dockerfile -t balewski/ubu24-qiskit:p7q   --platform linux/arm64   
 #   --platform linux/amd64   works w/o LD_PRELOAD  but generates WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
+# --no-cache tells Podman not to use any cached layers 
 # for omp_get_num_threads:  #      -e LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1 \
 # on PM use 'podman-hpc' instead of 'podman' and all should work
 # additionaly do 1 time: podman-hpc migrate balewski/ubuXX-qiskit-qml:p1
@@ -26,9 +27,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Install Qiskit  and its related packages within the virtual environment
 RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit  libs" && \
-     /opt/venv/bin/pip install --upgrade "qiskit[visualization,ibm]" qiskit_ibm_runtime qiskit-aer
+     /opt/venv/bin/pip install --upgrade "qiskit[visualization,ibm]" qiskit_ibm_runtime qiskit-aer  
 
-RUN pip install --upgrade qiskit-ibm-runtime
+RUN pip install --upgrade qiskit-ibm-runtime qiskit-experiments
 
 # QSP project w/ Kabir
 RUN /opt/venv/bin/pip install pyqsp pandas  openpyxl
@@ -52,3 +53,6 @@ RUN apt-get clean
 
 # Set the default command to bash
 CMD ["/bin/bash"]
+
+
+# check the latest version:  pip index versions qiskit 
