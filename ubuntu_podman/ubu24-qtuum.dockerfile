@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 # Quantinuum
 
-# podman build   -f ubu24-qtuum.dockerfile -t balewski/ubu24-qtuum:p1h   --platform linux/arm64   
+# podman build   -f ubu24-qtuum.dockerfile -t balewski/ubu24-qtuum:p2b   --platform linux/arm64   
 # PM: real      7m42.406s
 # for omp_get_num_threads:  #      -e LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1 \
 
@@ -38,6 +38,9 @@ RUN pip install --upgrade pip wheel setuptools
 
 # Install pytket and the Quantinuum extension
 RUN pip install pytket pytket-quantinuum qnexus pytket-qiskit qiskit-aer
+
+# upgrade all 3 - it made no difference
+# RUN pip install --upgrade pytket qnexus pytket-quantinuum pytket-qiskit
 
 # Install pyqir
 RUN pip install pyqir  
