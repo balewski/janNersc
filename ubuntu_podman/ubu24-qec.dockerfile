@@ -1,6 +1,6 @@
 FROM ubuntu:24.04
 
-#  podman build  --network=host -f ubu24-qec.dockerfile -t balewski/ubu24-qec:p1e   --platform linux/arm64   
+#  podman build  --network=host -f ubu24-qec.dockerfile -t balewski/ubu24-qec:p1g   --platform linux/arm64     --no-cache  
 #   --platform linux/amd64   works w/o LD_PRELOAD  but generates WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
 # for omp_get_num_threads:  #      -e LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1 \
 # on PM use 'podman-hpc' instead of 'podman' and all should work
@@ -32,15 +32,10 @@ RUN echo "2b-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA Qiskit  libs" && \
 # Clone Stim
 RUN git clone https://github.com/quantumlib/Stim.git /stim
 
-# (Option A) Install the Python package (includes C++ core build)
+# Install the Python package (includes C++ core build)
 RUN /opt/venv/bin/pip install /stim
 
-# (Option B) Build just the CLI binary - not working
-#RUN cd /stim && cmake -B build && cmake --build build --target stim && \
-#     cp build/stim /usr/local/bin/stim
-
 RUN /opt/venv/bin/pip install  pymatching sinter
-
 
 # Install additional Python libraries
 RUN echo "2d-AAAAAAAAAAAAAAAAAAAAAAAAAAAAA python libs" && \
