@@ -1,14 +1,16 @@
 FROM ubuntu:24.04
 
-# Podman example:
-#   podman build --network=host -f ubu24-aqdrop.dockerfile -t ubu24-aqdrop:p1 --platform linux/arm64
-# On PM use `podman-hpc` instead of `podman`.
+# HPC-Podman on PM 
+#  time  podman-hpc  build  -f ubu24-aqdrop-x86.dockerfile -t ubu24-aqdrop:p1
+# additionaly do 1 time:      podman-hpc migrate ubu24-aqdrop:p1
+
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Los_Angeles \
     VIRTUAL_ENV=/opt/venv \
     PATH="/opt/venv/bin:$PATH"
 
+# --- generic OS ppackages ---
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         aptitude \
@@ -45,13 +47,10 @@ RUN apt-get update && \
         xterm && \
     rm -rf /var/lib/apt/lists/*
 
+# -- generic python libs ---
 RUN python3 -m venv "${VIRTUAL_ENV}" && \
     pip install --upgrade pip && \
     pip install \
-        "qiskit[visualization,ibm]" \
-        qiskit-aer \
-        qiskit-experiments \
-        qiskit-ibm-runtime \
         bitstring \
         h5py \
         jupyter \
@@ -64,5 +63,9 @@ RUN python3 -m venv "${VIRTUAL_ENV}" && \
         pytz \
         scikit-learn \
         scipy
+
+# -- AQDrop speciffic ---
+RUN python3 -m venv "${VIRTUAL_ENV}" && \
+     pip install --upgrade  aqdrop
 
 CMD ["/bin/bash"]
